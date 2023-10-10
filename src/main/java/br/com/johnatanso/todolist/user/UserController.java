@@ -18,7 +18,7 @@ public class UserController {
 
         UserModel newUser = userRepository.createUser(userModel);
 
-        System.out.print(newUser);
+        System.out.println(newUser.getId());
 
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
