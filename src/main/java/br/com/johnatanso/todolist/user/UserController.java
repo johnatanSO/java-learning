@@ -1,26 +1,30 @@
 package br.com.johnatanso.todolist.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController()
 @RequestMapping("/user")
 public class UserController {
 
+    @Autowired
+    private IUserRepository userRepository;
+
     @PostMapping("/")
-    public ResponseEntity<UserModel> createUser(@RequestBody UserModel userModel) {
+    public ResponseEntity createUser(@RequestBody UserModel userModel) {
 
-        UserRepository userRepository = new UserRepository();
+        var userAlreadyExists = this.userRepository.findByEmail(userModel.getEmail());
 
-        UserModel newUser = userRepository.createUser(userModel);
+        if (userAlreadyExists != null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail já cadastrado no sistema");
+        }
 
-        System.out.println(newUser.getId());
+        var newUser = this.userRepository.save(userModel);
 
-        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
 }
 
