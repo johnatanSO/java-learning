@@ -54,6 +54,16 @@ public class TaskController {
 
         var task = this.taskRepository.findById(taskId).orElse(null);
 
+        var userId = (UUID) request.getAttribute("userId");
+
+        if (task == null) {
+            return ResponseEntity.status(401).body("Tarefa não encontrada");
+        }
+
+        if (!task.getUserId().equals(userId)) {
+            return ResponseEntity.status(401).body("Esta tarefa não pertence a este usuário");
+        }
+
         Utils.copyNonNullProperties(taskModel, task);
 
         this.taskRepository.save(task);
